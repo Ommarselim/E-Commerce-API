@@ -1,30 +1,36 @@
+import { Product } from 'src/products/Entities/product.entity';
 import { Review } from 'src/reviews/Entities/review.entity';
-import { User } from 'src/users/Entities/user.entity';
 import { CURRENT_TIMESTAMP } from 'src/utilities/constants';
+import { UserRole } from 'src/utilities/enums';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
-
-@Entity({ name: 'products' })
-export class Product {
+@Entity({ name: 'users' })
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  title: string;
+  @Column()
+  username: string;
 
   @Column()
-  description: string;
+  email: string;
 
-  @Column('decimal')
-  price: number;
+  @Column()
+  password: string;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;
@@ -36,10 +42,9 @@ export class Product {
   })
   updatedAt: Date;
 
-  @OneToMany(() => Review, review => review.product)
-  reviews: Review[];
+  @OneToMany(() => Product, product => product.user)
+  products: Product[];
 
-  @ManyToOne(() => User, user => user.products)
-  user: User;
-  
+  @OneToMany(() => Review, review => review.user)
+  reviews: Review[];
 }

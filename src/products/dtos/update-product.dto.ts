@@ -1,13 +1,14 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateProductDto {
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  name?: string;
+  title?: string;
 
   @IsString()
   @IsOptional()
+  @MinLength(5)
   description?: string;
 
   @IsNotEmpty()

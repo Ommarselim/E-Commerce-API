@@ -32,6 +32,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'warn',
       'linebreak-style': ['error', 'unix'],
       'prettier/prettier': 0,
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
 );

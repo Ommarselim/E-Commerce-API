@@ -5,6 +5,9 @@ export class CreateProductDto {
   @IsString()
   name: string;
 
+  @IsString()
+  description: string;
+
   @IsNotEmpty()
   @IsNumber()
   price: number;

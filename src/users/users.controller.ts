@@ -11,9 +11,13 @@ export class UsersController {
     return this.usersService.register(registerdto);
   }
 
-  @Get()
-    async getUsers() {
-        return this.usersService.getUsers();
-    }
+  @Post('/login')
+  async login(@Body() registerdto: RegisterDto) {
+    return this.usersService.login(registerdto);
+  }
 
+  @Get()
+  async getUsers() {
+    return this.usersService.getUsers();
+  }
 }

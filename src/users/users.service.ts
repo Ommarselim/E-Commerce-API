@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { LoginDto } from './dtos/login.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './Entities/user.entity';
@@ -17,21 +18,36 @@ export class UsersService {
     const existingUser = await this.usersRepository.findOne({
       where: { email },
     });
-
     if (existingUser) {
       throw new Error('User already exists');
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = this.usersRepository.create({
       ...userData,
       password: hashedPassword,
     });
-
     return this.usersRepository.save(newUser);
   }
 
-    async getUsers(): Promise<User[]> {
-        return this.usersRepository.find();
+  async login(LoginDto: LoginDto): Promise<User> {
+    const { email, password } = LoginDto;
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid password');
+    }
+    return user;
+  }
+
+
+  async getUsers(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
+
 }

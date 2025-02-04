@@ -1,5 +1,5 @@
 import { LoginDto } from './dtos/login.dto';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './Entities/user.entity';
@@ -60,7 +60,15 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  generateJWT(payload: JWTPayloadType): Promise<string> {
+  async getCurrentUser(userId: number): Promise<User | null> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if(!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  private generateJWT(payload: JWTPayloadType): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
 }

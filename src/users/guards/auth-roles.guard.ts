@@ -39,8 +39,6 @@ export class AuthRolesGuard implements CanActivate {
       const payload: JWTPayloadType = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'), // Corrected usage
       });
-      
-
 
       const user = await this.usersService.getCurrentUser(payload.userId);
       if (!user) return false;

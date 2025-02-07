@@ -8,6 +8,10 @@ import {
   UseGuards,
   Req,
   NotFoundException,
+  Put,
+  Param,
+  ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dtos/register.dto';
@@ -17,6 +21,7 @@ import { Request } from 'express';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/utilities/enums';
+import { UpdateUserDto } from './dtos/update-user.dto';
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -45,5 +50,20 @@ export class UsersController {
   @UseGuards(AuthRolesGuard)
   async getUsers() {
     return this.usersService.getUsers();
+  }
+  @Put('/:id')
+  @UseGuards(AuthGuard)
+  async updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() payload: JWTPayloadType,
+  ) {
+    return this.usersService.updateUser(id, updateUserDto, payload);
+  }
+
+  @Delete('/:id')
+  @UseGuards(AuthGuard)
+  async deleteUser(@Param('id', ParseIntPipe) id: number , @CurrentUser() payload: JWTPayloadType) {
+    return this.usersService.deleteUser(id , payload);
   }
 }

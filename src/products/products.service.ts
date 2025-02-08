@@ -1,7 +1,7 @@
 import { UsersService } from './../users/users.service';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto';
-import { Repository } from 'typeorm';
+import { Like, Repository, Between } from 'typeorm';
 import { Product } from './Entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateProductDto } from './dtos/update-product.dto';
@@ -27,8 +27,22 @@ export class ProductsService {
     return this.productsRepository.save(newProduct);
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productsRepository.find();
+  async findAll(
+    title?: string,
+    max?: number,
+    min?: number,
+  ): Promise<Product[]> {
+    const filters = {
+      title: title ? Like(`%${title}%`) : undefined,
+      price: max && min ? Between(min, max) : undefined,
+    };
+    try {
+      return this.productsRepository.find({
+        where: filters,
+      });
+    } catch (error) {
+      throw new NotFoundException('Products not found');
+    }
   }
 
   async findOne(id: number): Promise<Product> {

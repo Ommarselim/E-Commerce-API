@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Post, Put, Body, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Body,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
@@ -13,8 +23,8 @@ export class ProductsController {
   constructor(private readonly productService: ProductsService) {}
 
   @Get()
-  getAll() {
-    return this.productService.findAll();
+  getAll(@Query('title') title, @Query('max') max, @Query('min') min) {
+    return this.productService.findAll(title, max, min);
   }
 
   @Get(':id')
@@ -24,9 +34,12 @@ export class ProductsController {
 
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthRolesGuard)
-  @Post() 
-  create(@Body() createProductDto: CreateProductDto , @CurrentUser() payload: JWTPayloadType) {
-    return this.productService.create(createProductDto , payload.userId);
+  @Post()
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @CurrentUser() payload: JWTPayloadType,
+  ) {
+    return this.productService.create(createProductDto, payload.userId);
   }
 
   @Put(':id')
@@ -38,6 +51,4 @@ export class ProductsController {
   delete(@Param('id') id: number) {
     return this.productService.remove(Number(id));
   }
-  
-
 }

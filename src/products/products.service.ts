@@ -1,3 +1,4 @@
+import { UsersService } from './../users/users.service';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { Repository } from 'typeorm';
@@ -10,11 +11,20 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productsRepository: Repository<Product>,
+    private readonly usersService: UsersService,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = this.productsRepository.create(createProductDto);
-    return this.productsRepository.save(product);
+  async create(createProductDto: CreateProductDto, id: number) {
+    const user = await this.usersService.getCurrentUser(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const newProduct = this.productsRepository.create({
+      ...createProductDto,
+      title: createProductDto.title.toLowerCase(),
+      user,
+    });
+    return this.productsRepository.save(newProduct);
   }
 
   async findAll(): Promise<Product[]> {

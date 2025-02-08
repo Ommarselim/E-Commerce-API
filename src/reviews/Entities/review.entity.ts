@@ -18,7 +18,7 @@ export class Review {
   @Column({ type: 'int' })
   rating: number;
 
-  @Column( { type: 'varchar', length: 500 })
+  @Column({ type: 'varchar', length: 500 })
   comment: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })

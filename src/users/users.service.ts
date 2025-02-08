@@ -5,13 +5,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChildEntity, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './Entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './dtos/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JWTPayloadType, TokenType } from 'src/utilities/types';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { AuthProvider } from './auth.provider';
 
 @Injectable()
 export class UsersService {
@@ -19,47 +20,14 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly authprovider: AuthProvider,
   ) {}
 
-  async register(userData: RegisterDto): Promise<TokenType> {
-    const { email, password } = userData;
-    const existingUser = await this.usersRepository.findOne({
-      where: { email },
-    });
-    if (existingUser) {
-      throw new BadRequestException('User already exists');
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    let newUser = this.usersRepository.create({
-      ...userData,
-      password: hashedPassword,
-    });
-    newUser = await this.usersRepository.save(newUser);
-    const token = await this.generateJWT({
-      userId: newUser.id,
-      role: newUser.role,
-    });
-    return { token };
+  async create(userData: RegisterDto): Promise<TokenType> {
+    return this.authprovider.register(userData);
   }
-
   async login(LoginDto: LoginDto): Promise<TokenType> {
-    const { email, password } = LoginDto;
-    const user = await this.usersRepository.findOne({
-      where: { email },
-    });
-    // console.log(user);
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new BadRequestException('Invalid password');
-    }
-    const token = await this.generateJWT({
-      userId: user.id,
-      role: user.role,
-    });
-    return { token };
+    return this.authprovider.login(LoginDto);
   }
 
   async getUsers(): Promise<User[]> {
@@ -107,9 +75,5 @@ export class UsersService {
     }
     await this.usersRepository.delete(userId);
     return { message: 'User deleted successfully' };
-  }
-
-  private generateJWT(payload: JWTPayloadType): Promise<string> {
-    return this.jwtService.signAsync(payload);
   }
 }

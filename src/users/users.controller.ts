@@ -17,7 +17,6 @@ import { UsersService } from './users.service';
 import { RegisterDto } from './dtos/register.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { JWTPayloadType } from 'src/utilities/types';
-import { Request } from 'express';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/utilities/enums';
@@ -28,7 +27,7 @@ export class UsersController {
 
   @Post('/register')
   async register(@Body() registerdto: RegisterDto) {
-    return this.usersService.register(registerdto);
+    return this.usersService.create(registerdto);
   }
 
   @Post('/login')

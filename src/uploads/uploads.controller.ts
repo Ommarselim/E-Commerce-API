@@ -4,9 +4,12 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
+  Res,
+  Param,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
+import { Express, Response } from 'express';
 import { diskStorage } from 'multer';
 
 @Controller('/api/uploads')
@@ -29,7 +32,7 @@ export class UploadsController {
         }
       },
       limits: {
-        fileSize: 1024 * 1024 * 2 , // 2MB
+        fileSize: 1024 * 1024 * 2, // 2MB
       },
     }),
   )
@@ -41,5 +44,10 @@ export class UploadsController {
     return {
       message: 'File uploaded successfully',
     };
+  }
+
+  @Get('/:imageName')
+  public getImage(@Param('imageName') imageName: string, @Res() res: Response) {
+    res.sendFile(imageName, { root: './images' });
   }
 }

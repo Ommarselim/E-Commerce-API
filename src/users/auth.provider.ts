@@ -1,5 +1,10 @@
+import { MailService } from './../mail/mail.service';
 import { LoginDto } from './dtos/login.dto';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './Entities/user.entity';
@@ -14,6 +19,7 @@ export class AuthProvider {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(userData: RegisterDto): Promise<TokenType> {
@@ -59,6 +65,9 @@ export class AuthProvider {
       userId: user.id,
       role: user.role,
     });
+
+    await this.mailService.sendLoginEmail(email);
+
     return { token };
   }
 

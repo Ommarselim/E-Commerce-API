@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { UploadsModule } from './uploads/uploads.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UploadsModule } from './uploads/uploads.module';
       }),
     }),
     UploadsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

@@ -6,9 +6,11 @@ import { User } from './Entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config'; // Import ConfigModule and ConfigService if not already imported
 import { AuthProvider } from './auth.provider';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       inject: [ConfigService],

@@ -12,6 +12,8 @@ import {
   Param,
   ParseIntPipe,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterDto } from './dtos/register.dto';
@@ -21,6 +23,8 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/utilities/enums';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 @Controller('/api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -76,5 +80,24 @@ export class UsersController {
     @Param('verificationToken') verificationToken: string,
   ) {
     return this.usersService.verifyEmail(id, verificationToken);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  public forgotPassword(@Body() body: ForgotPasswordDto) {
+    return this.usersService.sendResetPassword(body.email);
+  }
+
+  @Get("reset-password/:id/:resetPasswordToken")
+  public getResetPassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Param("resetPasswordToken") resetPasswordToken: string,
+  ) {
+    return this.usersService.getResetPassword(id, resetPasswordToken);
+  }
+
+  @Post('reset-password')
+  public resetPassword(@Body() body: ResetPasswordDto) {
+    return this.usersService.resetPassword(body);
   }
 }

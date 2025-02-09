@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayloadType, TokenType } from 'src/utilities/types';
 import { randomBytes } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 @Injectable()
 export class AuthProvider {
   constructor(
@@ -84,6 +85,64 @@ export class AuthProvider {
     });
 
     return { token };
+  }
+
+  //sending reset password link to the client
+
+  public async sendResetPasswordLink(email: string) {
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException(" User with given email doesn't exist!");
+    }
+    user.resetPasswordToken = randomBytes(32).toString('hex');
+    const result = await this.usersRepository.save(user);
+    const resetPasswordlink = `${this.configService.get<string>('CLIENT_DOMAIN')}/reset-password/${user.id}/${result.resetPasswordToken}'`;
+    await this.mailService.sendResetPasswordTemplate(email, resetPasswordlink);
+    return {
+      message: 'Password reset link sent to you email, pleac check the inbox!',
+    };
+  }
+
+  // Get reset password link
+  public async getResetPasswordLink(
+    userId: number,
+    resetPasswordToken: string,
+  ) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    const sanitizedToken = resetPasswordToken.trim().replace(/['"]/g, '');
+
+    if (!user) {
+      throw new BadRequestException('Invalid Link!!');
+    }
+    if (
+      user.resetPasswordToken === null ||
+      user.resetPasswordToken !== sanitizedToken
+    ) {
+      throw new BadRequestException('Invalid Link!!');
+    }
+    return { message: 'valid link' };
+  }
+
+  public async resetPassword(dto: ResetPasswordDto) {
+    const { userId, resetPasswordToken, newPassword } = dto;
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const sanitizedToken = resetPasswordToken.trim().replace(/['"]/g, '');
+
+    if (!user) {
+      throw new BadRequestException('Invalid Link!!');
+    }
+    if (
+      user.resetPasswordToken === null ||
+      user.resetPasswordToken !== sanitizedToken
+    ) {
+      throw new BadRequestException('Invalid Link!!');
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    await this.usersRepository.save(user);
+    return { message: 'Password reset successfully, please log in' };
   }
 
   private generateJWT(payload: JWTPayloadType): Promise<string> {

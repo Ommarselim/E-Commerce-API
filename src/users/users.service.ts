@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayloadType, TokenType } from 'src/utilities/types';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { AuthProvider } from './auth.provider';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -91,5 +92,17 @@ export class UsersService {
     user.verificationToken = null;
     await this.usersRepository.save(user);
     return { message: 'Email verified successfully, please Login.' };
+  }
+
+  public sendResetPassword(email: string) {
+    return this.authprovider.sendResetPasswordLink(email);
+  }
+
+  public getResetPassword(userId: number, resetPasswordToken: string) {
+    return this.authprovider.getResetPasswordLink(userId, resetPasswordToken);
+  }
+
+  public resetPassword(dto: ResetPasswordDto) {
+    return this.authprovider.resetPassword(dto);
   }
 }

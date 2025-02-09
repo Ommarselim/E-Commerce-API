@@ -28,7 +28,6 @@ export class MailService {
     }
   }
 
-
   async sendVerifyEmailTemplate(email: string, link: string) {
     try {
       await this.mailerService.sendMail({
@@ -38,6 +37,24 @@ export class MailService {
         template: 'verify-email',
         context: {
           link,
+        },
+      });
+      console.log('✅ Email sent successfully');
+    } catch (error) {
+      console.log(error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+  async sendResetPasswordTemplate(email: string, resetPasswordlink: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        from: `<no-replay@my-nestjs-app.com`,
+        subject: 'Reset Password!',
+        template: 'reset-password',
+        context: {
+          resetPasswordlink,
         },
       });
       console.log('✅ Email sent successfully');

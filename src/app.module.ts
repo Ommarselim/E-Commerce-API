@@ -7,12 +7,14 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
     UsersModule,
     ProductsModule,
     ReviewsModule,
+    UploadsModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.development' }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -27,6 +29,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         synchronize: process.env.NODE_ENV !== 'production', // set to false in production
       }),
     }),
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

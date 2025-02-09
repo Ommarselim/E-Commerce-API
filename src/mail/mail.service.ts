@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, RequestTimeoutException } from '@nestjs/common';
+import e from 'express';
 
 @Injectable()
 export class MailService {
@@ -14,11 +15,13 @@ export class MailService {
         to: email,
         from: `<no-replay@my-nestjs-app.com`,
         subject: 'Login notification',
-        html: `
-                <h1>Login notification</h1>
-                <p>You have logged in to your account at ${today.toLocaleString()}</p>
-              `,
+        template: 'login',
+        context: {
+          date: today,
+          email: email,
+        }
       });
+      console.log('✅ Email sent successfully');
     } catch (error) {
       console.log(error);
       throw new RequestTimeoutException();

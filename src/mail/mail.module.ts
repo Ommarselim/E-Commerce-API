@@ -3,7 +3,8 @@ import { MailController } from './mail.controller';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import { join } from 'path';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 @Module({
   imports: [
     ConfigModule, // Ensure ConfigModule is imported
@@ -19,8 +20,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             pass: config.get<string>('SMTP_PASSWORD'),
           },
         },
-        defaults: {
-          from: '"No Reply" <no-reply@example.com>',
+        template: {
+          dir: join(process.cwd(), 'src/mail/templates'), // Absolute path from project root
+          adapter: new EjsAdapter({
+            inlineCssEnabled: true,
+          }),
         },
       }),
     }),

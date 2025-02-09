@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #333;
+        background-color: #e46161;
+      }
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #806868;
+        border: 1px solid #000000;
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      p {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Login Notification</h1>
+      <h1>Hello <%= email %>!</h1>
+      <p>
+        You have logged in to your account at <%= new Date().toLocaleString() %>
+      </p>
+    </div>
+  </body>
+</html>

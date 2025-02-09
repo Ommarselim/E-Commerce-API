@@ -31,6 +31,9 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
+  @Column({ type: 'varchar', nullable: true })
+  verificationToken: string | null;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
 

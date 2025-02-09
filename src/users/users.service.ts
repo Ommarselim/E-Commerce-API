@@ -23,10 +23,10 @@ export class UsersService {
     private readonly authprovider: AuthProvider,
   ) {}
 
-  async create(userData: RegisterDto): Promise<TokenType> {
+  async create(userData: RegisterDto) {
     return this.authprovider.register(userData);
   }
-  async login(LoginDto: LoginDto): Promise<TokenType> {
+  async login(LoginDto: LoginDto) {
     return this.authprovider.login(LoginDto);
   }
 
@@ -75,5 +75,21 @@ export class UsersService {
     }
     await this.usersRepository.delete(userId);
     return { message: 'User deleted successfully' };
+  }
+
+  async verifyEmail(id: number, token: string): Promise<{ message: string }> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.verificationToken || user.verificationToken !== token) {
+      throw new NotFoundException('Invalid Link!');
+    }
+    user.isVerified = true;
+    user.verificationToken = null;
+    await this.usersRepository.save(user);
+    return { message: 'Email verified successfully, please Login.' };
   }
 }

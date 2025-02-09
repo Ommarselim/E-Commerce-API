@@ -62,7 +62,19 @@ export class UsersController {
 
   @Delete('/:id')
   @UseGuards(AuthGuard)
-  async deleteUser(@Param('id', ParseIntPipe) id: number , @CurrentUser() payload: JWTPayloadType) {
-    return this.usersService.deleteUser(id , payload);
+  async deleteUser(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() payload: JWTPayloadType,
+  ) {
+    return this.usersService.deleteUser(id, payload);
+  }
+
+  // GET: ~//api/users/verify-email/:id/:verificationToken
+  @Get('/verify-email/:id/:verificationToken')
+  async verifyEmail(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('verificationToken') verificationToken: string,
+  ) {
+    return this.usersService.verifyEmail(id, verificationToken);
   }
 }

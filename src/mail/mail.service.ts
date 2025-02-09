@@ -19,7 +19,26 @@ export class MailService {
         context: {
           date: today,
           email: email,
-        }
+        },
+      });
+      console.log('✅ Email sent successfully');
+    } catch (error) {
+      console.log(error);
+      throw new RequestTimeoutException();
+    }
+  }
+
+
+  async sendVerifyEmailTemplate(email: string, link: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        from: `<no-replay@my-nestjs-app.com`,
+        subject: 'Verify Your Account notification',
+        template: 'verify-email',
+        context: {
+          link,
+        },
       });
       console.log('✅ Email sent successfully');
     } catch (error) {
